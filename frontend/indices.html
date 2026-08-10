@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowwPro Live Index Ticker</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #080c14;
+            --card-bg: rgba(13, 20, 38, 0.6);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary: #06b6d4;
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            padding: 12px;
+        }
+
+        .ticker-window {
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .ticker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge {
+            font-size: 9px;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 6px var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        .ticker-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            flex: 1;
+            align-items: center;
+        }
+
+        .index-card {
+            background: rgba(14, 20, 36, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.15s ease, transform 0.15s ease;
+            position: relative;
+        }
+
+        .index-card.tick-up {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .index-card.tick-down {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .index-name-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .index-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .index-symbol {
+            font-size: 9.5px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        .index-price-area {
+            text-align: right;
+        }
+
+        .index-price {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            transition: color 0.15s ease;
+        }
+        .index-card.tick-up .index-price {
+            color: var(--success);
+        }
+        .index-card.tick-down .index-price {
+            color: var(--danger);
+        }
+
+        .index-change {
+            font-size: 10px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 2px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .index-change.positive {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+        .index-change.negative {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .footer-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            padding-top: 6px;
+        }
+
+        .sync-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .sync-btn:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-window">
+        <!-- Ticker Header -->
+        <div class="ticker-header">
+            <div class="brand">
+                <i class="fa-solid fa-chart-line"></i> GrowwPro Ticker
+            </div>
+            <div class="status-badge" id="status-label">Live Feed</div>
+        </div>
+
+        <!-- Ticker Grid -->
+        <div class="ticker-grid">
+            <!-- Nifty 50 Card -->
+            <div class="index-card" id="card-^NSEI">
+                <div class="index-name-area">
+                    <span class="index-name">Nifty 50</span>
+                    <span class="index-symbol">^NSEI</span>
+                </div>
+                <div class="index-price-area">
+                    <div class="index-price" id="price-^NSEI">₹24,570.65</div>
+                    <span class="index-change positive" id="change-^NSEI">+0.00 (+0.00%)</span>
+                </div>
+            </div>
+
+            <!-- Sensex Card -->
+            <div class="index-card" id="card-^BSESN">
+                <div class="index-name-area">
+                    <span class="index-name">S&P BSE Sensex</span>
+                    <span class="index-symbol">^BSESN</span>
+                </div>
+                <div class="index-price-area">
+                    <div class="index-price" id="price-^BSESN">₹78,459.52</div>
+                    <span class="index-change negative" id="change-^BSESN">-39.65 (-0.05%)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Controls -->
+        <div class="footer-controls">
+            <span id="update-timestamp">Last synced: Just now</span>
+            <button class="sync-btn" id="sync-trigger">
+                <i class="fa-solid fa-arrows-rotate"></i> Sync Live Baseline
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const indicesState = {
+            "^NSEI": { price: 24570.65, change: 0, pct_change: 0, name: "Nifty 50" },
+            "^BSESN": { price: 78459.52, change: -39.65, pct_change: -0.05, name: "S&P BSE Sensex" }
+        };
+
+        // Fetch indices baseline from yfinance
+        async function fetchIndicesBaseline() {
+            const btn = document.getElementById("sync-trigger");
+            const statusLabel = document.getElementById("status-label");
+            if (btn) btn.disabled = true;
+            statusLabel.textContent = "Syncing...";
+            
+            try {
+                // Fetch indices from backend
+                const response = await fetch("/api/market/indices");
+                const data = await response.json();
+                
+                data.forEach(idx => {
+                    if (indicesState[idx.symbol]) {
+                        indicesState[idx.symbol].price = idx.price;
+                        indicesState[idx.symbol].change = idx.change;
+                        indicesState[idx.symbol].pct_change = idx.pct_change;
+                        
+                        updateIndexUI(idx.symbol, idx.price, idx.change, idx.pct_change, false);
+                    }
+                });
+                
+                const timeString = new Date().toLocaleTimeString();
+                document.getElementById("update-timestamp").textContent = `Last synced: ${timeString}`;
+            } catch (err) {
+                console.error("Baseline sync error:", err);
+            } finally {
+                if (btn) btn.disabled = false;
+                statusLabel.textContent = "Live Feed";
+            }
+        }
+
+        // Render index changes to DOM, adding tick highlight animations
+        function updateIndexUI(symbol, price, change, pct_change, isTick = true) {
+            const priceEl = document.getElementById(`price-${symbol}`);
+            const changeEl = document.getElementById(`change-${symbol}`);
+            const cardEl = document.getElementById(`card-${symbol}`);
+            
+            if (!priceEl || !changeEl || !cardEl) return;
+            
+            // Format price
+            priceEl.textContent = "₹" + price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
+            // Format changes
+            const isPositive = change >= 0;
+            const sign = isPositive ? "+" : "";
+            changeEl.textContent = `${sign}${change.toFixed(2)} (${sign}${pct_change.toFixed(2)}%)`;
+            
+            if (isPositive) {
+                changeEl.className = "index-change positive";
+            } else {
+                changeEl.className = "index-change negative";
+            }
+            
+            // Visual flashing animation for tick actions
+            if (isTick) {
+                const tickClass = change >= 0 ? "tick-up" : "tick-down";
+                cardEl.classList.add(tickClass);
+                
+                setTimeout(() => {
+                    cardEl.classList.remove(tickClass);
+                }, 400);
+            }
+        }
+
+        // Micro-fluctuation generator (simulates live feed ticks every second)
+        function simulateLiveTick() {
+            Object.keys(indicesState).forEach(symbol => {
+                const idx = indicesState[symbol];
+                
+                // Live Indian indices usually trade with tight spreads. Apply micro fluctuation of ±0.015% max
+                const factor = 1 + (Math.random() - 0.5) * 0.0003; 
+                const oldPrice = idx.price;
+                const newPrice = oldPrice * factor;
+                const priceDiff = newPrice - oldPrice;
+                
+                // Update state
+                idx.price = newPrice;
+                idx.change += priceDiff;
+                
+                // Recalculate pct change roughly
+                // Let's assume baseline is around the price divided by (1 + pct_change)
+                const baseline = oldPrice / (1 + idx.pct_change / 100);
+                idx.pct_change = ((newPrice - baseline) / baseline) * 100;
+                
+                // Update interface with visual tick indicator
+                updateIndexUI(symbol, newPrice, idx.change, idx.pct_change, true);
+            });
+        }
+
+        // Init and Intervals
+        document.addEventListener("DOMContentLoaded", () => {
+            // First baseline fetch
+            fetchIndicesBaseline();
+            
+            // Sync actual prices every 15 seconds from backend
+            setInterval(fetchIndicesBaseline, 15000);
+            
+            // Live ticks every 1 second (1000ms)
+            setInterval(simulateLiveTick, 1000);
+            
+            // Register sync trigger click
+            document.getElementById("sync-trigger").addEventListener("click", fetchIndicesBaseline);
+        });
+    </script>
+</body>
+</html>

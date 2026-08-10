@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Portfolio Analyzer - Premium Investment Analytics</title>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Top Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- AUTH SECTION -->
+    <div id="auth-section" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fa-solid fa-chart-line-up"></i>
+                    <span>GrowwPro Portfolio</span>
+                </div>
+                <h1 id="auth-title">Welcome Back</h1>
+                <p id="auth-subtitle">Analyze your investments with advanced metrics and AI commentary.</p>
+            </div>
+            
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="auth-email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="auth-email" class="form-control" required placeholder="name@domain.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="auth-password" class="form-control" required placeholder="••••••••" minlength="6">
+                    </div>
+                </div>
+                <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">Log In</button>
+            </form>
+            
+            <div class="auth-footer">
+                <span id="auth-toggle-text">Don't have an account?</span>
+                <a href="#" id="auth-toggle-link">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SECTION -->
+    <div id="app-section" class="app-container hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" id="sidebar-logo-link" class="logo" style="text-decoration: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>GrowwPro</span>
+                </a>
+                <button id="sidebar-toggle" class="sidebar-toggle" title="Toggle Sidebar">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="user-profile">
+                <div class="avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <span id="user-email" class="email">user@example.com</span>
+                    <span class="status">Premium Member</span>
+                </div>
+            </div>
+
+            <!-- Theme Toggle Switch -->
+            <div class="theme-toggle-wrapper" id="theme-toggle-wrapper">
+                <div class="theme-toggle-label">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                    <span id="theme-toggle-label-text">Light Mode</span>
+                </div>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle-checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-divider"></div>
+                
+                <a href="#" id="logout-btn" class="nav-link logout">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Log Out</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- GrowwPro Intelligence Status Bar -->
+            <div class="header-status-strip" id="header-status-strip">
+                <div class="strip-brand"><i class="fa-solid fa-shield-halved"></i> GrowwPro AI Core</div>
+                <div class="status-badge"><i class="fa-solid fa-lock"></i> Security Guardrails Active</div>
+                <div class="status-badge"><i class="fa-solid fa-grip"></i> Squarified Treemap Engine</div>
+                <div class="status-badge"><i class="fa-solid fa-robot"></i> LangChain Advisor Online</div>
+                <div class="strip-live-dot"></div>
+            </div>
+
+            <!-- Header -->
+            <header class="content-header">
+                <div>
+                    <h2 id="current-portfolio-name">Select or Create a Portfolio</h2>
+                    <p id="current-portfolio-date" class="text-muted">Analyze allocations, risks, and generated AI insights.</p>
+                </div>
+                <div class="header-controls">
+                    <div class="portfolio-select-container">
+                        <select id="portfolio-select" class="form-control select-header">
+                            <option value="" disabled selected>Select a Portfolio</option>
+                        </select>
+                    </div>
+                    <button id="create-portfolio-btn" class="btn btn-secondary btn-sm">
+                        <i class="fa-solid fa-plus"></i> Create Portfolio
+                    </button>
+                    <div id="portfolio-actions" class="hidden">
+                        <button id="delete-portfolio-btn" class="btn btn-danger-outline btn-sm">
+                            <i class="fa-solid fa-trash-can"></i> Delete Portfolio
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Welcome View when no portfolio is selected -->
+            <div id="welcome-view" class="welcome-dashboard">
+                <!-- Interactive Wealth Compounding Simulator & Strategy Hub -->
+                <div class="wealth-simulator-section">
+                    <div class="simulator-header">
+                        <div class="simulator-title">
+                            <i class="fa-solid fa-calculator" style="color: var(--primary); font-size: 22px;"></i>
+                            <div>
+                                <h3>Interactive Wealth Compounding Simulator</h3>
+                                <p class="text-muted">Model your long-term portfolio growth with compound returns & strategy blueprints.</p>
+                            </div>
+                        </div>
+                        <div class="preset-buttons">
+                            <button type="button" class="btn-preset active" data-rate="12">Balanced (12%)</button>
+                            <button type="button" class="btn-preset" data-rate="18">Aggressive (18%)</button>
+                            <button type="button" class="btn-preset" data-rate="8">Defensive (8%)</button>
+                        </div>
+                    </div>
+
+                    <div class="simulator-grid">
+                        <!-- Controls Column -->
+                        <div class="simulator-controls">
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <label for="sim-monthly">Monthly Investment (SIP)</label>
+                                    <span id="sim-monthly-val" class="slider-val">₹10,000</span>
+                                </div>
+                                <input type="range" id="sim-monthly" min="1000" max="100000" step="1000" value="10000" class="sim-range">
+                            </div>
+
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <label for="sim-years">Investment Horizon</label>
+                                    <span id="sim-years-val" class="slider-val">10 Years</span>
+                                </div>
+                                <input type="range" id="sim-years" min="1" max="30" step="1" value="10" class="sim-range">
+                            </div>
+
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <label for="sim-rate">Expected Annual Return</label>
+                                    <span id="sim-rate-val" class="slider-val">12.0%</span>
+                                </div>
+                                <input type="range" id="sim-rate" min="5" max="25" step="0.5" value="12" class="sim-range">
+                            </div>
+                        </div>
+
+                        <!-- Results Column -->
+                        <div class="simulator-results">
+                            <div class="sim-result-card total-wealth">
+                                <div class="sim-card-label">Projected Total Wealth</div>
+                                <div class="sim-card-value" id="sim-total-wealth">₹23,23,391</div>
+                                <div class="sim-card-sub" id="sim-wealth-growth">+93.6% Wealth Multiplier</div>
+                            </div>
+                            <div class="sim-result-mini-grid">
+                                <div class="sim-result-card">
+                                    <div class="sim-card-label">Total Amount Invested</div>
+                                    <div class="sim-card-value-sm" id="sim-total-invested">₹12,00,000</div>
+                                </div>
+                                <div class="sim-result-card">
+                                    <div class="sim-card-label">Estimated Wealth Gain</div>
+                                    <div class="sim-card-value-sm gain" id="sim-total-gain">₹11,23,391</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategy Blueprints -->
+                    <div class="blueprints-row">
+                        <div class="blueprint-card">
+                            <div class="blueprint-icon"><i class="fa-solid fa-chart-line"></i></div>
+                            <div class="blueprint-info">
+                                <h5>Aggressive Growth Model</h5>
+                                <p>75% Equities, 15% Tech, 10% Cash. Ideal for maximum wealth compounding over 10+ years.</p>
+                            </div>
+                        </div>
+                        <div class="blueprint-card">
+                            <div class="blueprint-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <div class="blueprint-info">
+                                <h5>Balanced Core Model</h5>
+                                <p>50% Bluechips, 35% Financials, 15% Bonds. Optimized for steady risk-adjusted returns.</p>
+                            </div>
+                        </div>
+                        <div class="blueprint-card">
+                            <div class="blueprint-icon"><i class="fa-solid fa-shield"></i></div>
+                            <div class="blueprint-info">
+                                <h5>Defensive Dividend Model</h5>
+                                <p>40% Staples, 40% Energy/Utilities, 20% Treasury. Focus on capital preservation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live News Feed Section -->
+                <div class="news-feed-section">
+                    <div class="section-title-area">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <h3>Live Financial & Business News</h3>
+                        <p>Stay up to date with the latest Indian business headlines and stock market news.</p>
+                    </div>
+
+                    <div class="news-grid" id="market-news-grid">
+                        <div class="news-loading">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Loading news updates...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Dashboard View -->
+            <div id="dashboard-view" class="dashboard-grid hidden">
+                
+                <!-- ROW 1: Summary Cards -->
+                <div class="summary-cards-container col-span-3">
+                    <div class="metric-card">
+                        <div class="card-label">Total Value</div>
+                        <div id="metric-total-value" class="card-value">₹0.00</div>
+                        <div id="metric-return-pct" class="card-badge positive">+0.00%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="card-label">Total Cost Basis</div>
+                        <div id="metric-cost-basis" class="card-value">₹0.00</div>
+                        <div class="card-desc">Initial purchase amount</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="card-label">Absolute Return</div>
+                        <div id="metric-absolute-return" class="card-value">₹0.00</div>
+                        <div id="metric-return-arrow" class="card-desc"><i class="fa-solid fa-arrow-trend-up"></i> Net performance</div>
+                    </div>
+                </div>
+
+                <!-- ROW 2: Risk Metrics -->
+                <div class="summary-cards-container col-span-3">
+                    <div class="metric-card risk">
+                        <div class="card-label">Annual Volatility <i class="fa-solid fa-circle-info" title="Annualized standard deviation of daily returns. Lower is less volatile."></i></div>
+                        <div id="metric-volatility" class="card-value">0.00%</div>
+                        <div class="card-desc">Price fluctuations</div>
+                    </div>
+                    <div class="metric-card risk">
+                        <div class="card-label">Sharpe Ratio <i class="fa-solid fa-circle-info" title="Risk-adjusted return compared to 6% risk-free rate. Higher is better."></i></div>
+                        <div id="metric-sharpe" class="card-value">0.00</div>
+                        <div id="metric-sharpe-desc" class="card-desc">Risk-adjusted return</div>
+                    </div>
+                    <div class="metric-card risk">
+                        <div class="card-label">Beta (vs Nifty 50) <i class="fa-solid fa-circle-info" title="Sensitivity to market movements. > 1 is more volatile, < 1 is less volatile."></i></div>
+                        <div id="metric-beta" class="card-value">1.00</div>
+                        <div id="metric-beta-desc" class="card-desc">Market correlation</div>
+                    </div>
+                    <div class="metric-card risk">
+                        <div class="card-label">Max Drawdown <i class="fa-solid fa-circle-info" title="Largest peak-to-trough drop in value over the past year."></i></div>
+                        <div id="metric-drawdown" class="card-value">0.00%</div>
+                        <div class="card-desc">Peak-to-trough peak loss</div>
+                    </div>
+                </div>
+
+                <!-- ROW 3: Charts -->
+                <div class="card chart-card col-span-2">
+                    <div class="card-header">
+                        <h4>Performance History (1 Year)</h4>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performance-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h4>Asset Allocations</h4>
+                        <div class="chart-toggles">
+                            <button id="chart-toggle-ticker" class="btn-toggle active">Ticker</button>
+                            <button id="chart-toggle-sector" class="btn-toggle">Sector</button>
+                        </div>
+                    </div>
+                    <div class="chart-container donut">
+                        <canvas id="allocation-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- ROW 3b: Asset Treemap -->
+                <div class="card chart-card treemap-card col-span-3">
+                    <div class="card-header">
+                        <h4><i class="fa-solid fa-grip" style="margin-right: 6px; color: var(--primary);"></i>Asset Treemap</h4>
+                    </div>
+                    <div class="treemap-container" id="treemap-container">
+                        <canvas id="treemap-canvas"></canvas>
+                        <div class="treemap-tooltip" id="treemap-tooltip">
+                            <div class="treemap-tooltip-ticker" id="treemap-tooltip-ticker"></div>
+                            <div class="treemap-tooltip-sector" id="treemap-tooltip-sector"></div>
+                            <div class="treemap-tooltip-value" id="treemap-tooltip-value"></div>
+                        </div>
+                    </div>
+                    <div class="treemap-legend" id="treemap-legend"></div>
+                </div>
+
+                <!-- ROW 4: Holdings List -->
+                <div class="card col-span-2">
+                    <div class="card-header">
+                        <h4>Stock Holdings</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Ticker</th>
+                                    <th>Sector</th>
+                                    <th>Qty</th>
+                                    <th>Buy Price</th>
+                                    <th>Current Price</th>
+                                    <th>Current Value</th>
+                                    <th>Return</th>
+                                    <th>Weight</th>
+                                    <th style="width: 80px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="holdings-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ROW 5: Add Holdings Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add Position</h4>
+                    </div>
+                    <form id="add-holding-form">
+                        <div class="form-group">
+                            <label for="holding-ticker">Ticker Symbol</label>
+                            <input type="text" id="holding-ticker" required placeholder="e.g. RELIANCE.NS, TCS.BO" class="form-control uppercase">
+                            <span class="input-help">Use .NS suffix for NSE, .BO for BSE.</span>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="holding-qty">Quantity</label>
+                                <input type="number" id="holding-qty" required min="0.0001" step="any" placeholder="0" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="holding-price">Buy Price (₹)</label>
+                                <input type="number" id="holding-price" required min="0.01" step="any" placeholder="0.00" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="holding-date">Purchase Date</label>
+                            <input type="date" id="holding-date" required class="form-control">
+                        </div>
+                        <button type="submit" id="add-position-submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-plus"></i> Add Position
+                        </button>
+                    </form>
+                </div>
+
+                <!-- ROW 6: AI Insights Layer -->
+                <div class="card col-span-3 insights-card">
+                    <div class="card-header insights-header">
+                        <div class="insights-title-area">
+                            <i class="fa-solid fa-sparkles"></i>
+                            <h4>GenAI Diagnostics (Mistral AI)</h4>
+                        </div>
+                        <button id="regenerate-insights-btn" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-sparkles"></i> Run AI Diagnostics
+                        </button>
+                    </div>
+                    
+                    <!-- Loading Skeleton -->
+                    <div id="insights-skeleton" class="insights-skeleton hidden">
+                        <div class="skeleton-line header"></div>
+                        <div class="skeleton-line body"></div>
+                        <div class="skeleton-line body"></div>
+                        <div class="skeleton-line body small"></div>
+                    </div>
+
+                    <!-- AI Commentary Display -->
+                    <div id="insights-content" class="insights-body">
+                        <div class="insight-section">
+                            <h5><i class="fa-solid fa-clipboard-list"></i> Portfolio Summary</h5>
+                            <p id="insight-summary">Loading your portfolio analysis...</p>
+                        </div>
+                        <div class="insight-grid">
+                            <div class="insight-section">
+                                <h5><i class="fa-solid fa-shield-halved"></i> Risk Analysis</h5>
+                                <p id="insight-risk">Analysis loading...</p>
+                            </div>
+                            <div class="insight-section">
+                                <h5><i class="fa-solid fa-table-cells"></i> Diversification Score</h5>
+                                <p id="insight-diversification">Analysis loading...</p>
+                            </div>
+                        </div>
+                        <div class="insight-section">
+                            <h5><i class="fa-solid fa-eye"></i> Focus & Watch Items</h5>
+                            <ul id="insight-watch-list">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+
+
+                        <div id="insight-disclaimer" class="insight-disclaimer">
+                            Disclaimer: Educational commentary only.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Creating Portfolio -->
+    <div id="create-portfolio-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Create New Portfolio</h3>
+                <button id="close-modal-btn" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="create-portfolio-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="portfolio-name-input">Portfolio Name</label>
+                        <input type="text" id="portfolio-name-input" required placeholder="e.g. My Long Term Wealth" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancel-modal-btn" class="btn btn-secondary-outline">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Portfolio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FLOATING CHAT ADVISOR WIDGET -->
+    <button id="chat-toggle-floating" class="chat-floating-bubble hidden" title="AI Advisor" aria-label="Open AI Chat Advisor">
+        <i class="fa-solid fa-comments"></i>
+    </button>
+
+    <div id="chat-floating-widget" class="chat-floating-widget hidden">
+        <div class="chat-widget-header">
+            <div class="chat-widget-title">
+                <i class="fa-solid fa-robot"></i>
+                <span>GrowwPro AI Advisor</span>
+            </div>
+            <button id="chat-close-floating" class="chat-widget-close" title="Minimize Chat">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <div class="message assistant">
+                Hello! I am your GrowwPro AI Advisor. Ask me anything about your active portfolio's asset allocation, sector weights, risk metrics, or holdings.
+            </div>
+        </div>
+        <form id="chat-form" class="chat-input-wrapper">
+            <input type="text" id="chat-input" class="form-control chat-input" placeholder="Type your question..." required autocomplete="off">
+            <button type="submit" class="btn btn-primary chat-send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- FLOATING REBALANCER WIDGET -->
+    <button id="rebalancer-toggle-floating" class="rebalancer-floating-bubble hidden" title="Smart Rebalancer" aria-label="Open Smart Rebalancer">
+        <i class="fa-solid fa-scale-unbalanced-flip"></i>
+    </button>
+
+    <div id="rebalancer-floating-widget" class="rebalancer-floating-widget hidden">
+        <div class="rebalancer-widget-header">
+            <div class="rebalancer-widget-title">
+                <i class="fa-solid fa-scale-unbalanced-flip"></i>
+                <span>Smart Rebalancer</span>
+            </div>
+            <button id="rebalancer-close-floating" class="rebalancer-widget-close" title="Minimize"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="rebalancer-widget-body">
+            <div style="text-align: center; margin-bottom: 12px;">
+                <button id="run-rebalancer-btn" class="btn btn-primary btn-block btn-sm" style="font-size: 12.5px; height: 36px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(139,92,246,0.25);">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i> Scan Underperforming Stock
+                </button>
+            </div>
+            <div id="rebalancer-modal-loading" class="rebalancer-loading hidden" style="text-align: center; padding: 30px 0; color: var(--text-secondary);">
+                <i class="fa-solid fa-spinner fa-spin fa-lg" style="margin-bottom: 10px; color: #a78bfa; display: block;"></i>
+                <div style="font-size: 12px;">Analyzing positions...</div>
+            </div>
+            <div id="rebalancer-modal-output" style="overflow-y: auto; flex: 1; padding-right: 4px;">
+                <div class="text-muted" style="font-size: 12.5px; text-align: center; padding: 30px 0;">
+                    Click "Scan Underperforming Stock" to find weak assets and suggest alternatives.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
