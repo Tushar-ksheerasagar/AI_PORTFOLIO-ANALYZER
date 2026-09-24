@@ -1,28 +1,73 @@
+<div align="center">
+
 # AI Portfolio Analyzer
 
-AI Portfolio Analyzer is a full-stack investment portfolio dashboard for Indian equities. It tracks NSE/BSE holdings, calculates portfolio performance and risk metrics, and generates plain-English diagnostics with Mistral AI.
+### Read the market. Understand the risk. Invest with context.
 
-## Features
+A full-stack portfolio intelligence dashboard for Indian equities, combining live NSE/BSE data, quantitative analytics, and Mistral AI commentary in one focused workspace.
 
-- User registration, login, logout, and HttpOnly JWT cookie authentication
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Mistral AI](https://img.shields.io/badge/Mistral_AI-Insights-FF7000?style=for-the-badge)](https://mistral.ai/)
+
+[Run locally](#-run-locally) | [Configure](#-configure) | [API map](#-api-map) | [Test](#-test)
+
+</div>
+
+---
+
+## The product
+
+AI Portfolio Analyzer turns a collection of holdings into a readable decision surface. Create portfolios, add Indian equity positions, inspect performance and risk, then ask the AI layer to explain what the numbers suggest.
+
+| Track | Understand | Act |
+| --- | --- | --- |
+| NSE/BSE prices and history | Returns, volatility, beta, Sharpe ratio, drawdown, and concentration | Review AI summaries, risk notes, diversification, and watch lists |
+
+## What is inside
+
+### Portfolio workspace
+
+- Secure registration, login, logout, and HttpOnly JWT cookies
 - Multiple portfolios with create, select, and delete workflows
-- NSE/BSE market data from `yfinance`, with cached ticker history
-- Portfolio analytics including returns, volatility, Sharpe ratio, beta, drawdown, and concentration
-- AI portfolio summaries, risk commentary, diversification analysis, and watch lists
-- Nifty 50 and S&P BSE Sensex market cards
-- Business news feed with fallback data when an external feed is unavailable
-- FastAPI Swagger and ReDoc documentation
+- Holdings captured with ticker, quantity, purchase price, and purchase date
 
-## Technology
+### Market intelligence
 
-- Frontend: HTML, vanilla JavaScript, CSS, and Chart.js
-- Backend: FastAPI and Uvicorn
-- Database: PostgreSQL with SQLAlchemy
-- Market data: `yfinance`
-- AI: Mistral AI and LangChain
-- Tests: pytest with an in-memory SQLite test database
+- `yfinance` market data for NSE/BSE symbols
+- Cached ticker history to reduce repeated upstream requests
+- Nifty 50 and S&P BSE Sensex cards
+- Business headlines with a fallback response when the feed is unavailable
 
-## Project Structure
+### Decision support
+
+- Return and risk analytics for each portfolio
+- Mistral AI summaries, risk commentary, diversification analysis, and watch lists
+- FastAPI Swagger UI and ReDoc for API exploration
+
+## Architecture
+
+```text
+Browser (HTML + CSS + JavaScript + Chart.js)
+                |
+                v
+       FastAPI application
+        /       |        \
+       v        v         v
+ PostgreSQL  yfinance  Mistral AI
+(SQLAlchemy) (market)  (insights)
+```
+
+| Layer | Tools |
+| --- | --- |
+| Interface | HTML, vanilla JavaScript, CSS, Chart.js |
+| API | FastAPI, Uvicorn, Pydantic |
+| Data | PostgreSQL, SQLAlchemy |
+| Intelligence | yfinance, Mistral AI, LangChain |
+| Quality | pytest, in-memory SQLite test database |
+
+## Project map
 
 ```text
 app/
@@ -31,22 +76,21 @@ app/
   routers/    Authentication, portfolio, holding, analytics, and insight APIs
   schemas/    Pydantic request and response schemas
   services/   Market data, analytics, and AI services
-  main.py     FastAPI application and frontend static-file mount
+  main.py     FastAPI app and frontend static-file mount
 frontend/     SPA HTML, CSS, and JavaScript
 tests/        Analytics and endpoint tests
 .env.example  Environment variable template
-requirements.txt
 ```
 
-## Requirements
+## Run locally
+
+### 1. Requirements
 
 - Python 3.10 or newer
 - PostgreSQL running locally or remotely
 - A Mistral AI API key for AI insights
 
-## Installation
-
-Clone the repository and create a virtual environment:
+### 2. Install
 
 ```bash
 git clone https://github.com/Tushar-ksheerasagar/AI_PORTFOLIO-ANALYZER.git
@@ -72,9 +116,9 @@ Install dependencies:
 python -m pip install -r requirements.txt
 ```
 
-## Configuration
+## Configure
 
-Copy `.env.example` to `.env` and update the values:
+Create a local environment file from the template:
 
 ```powershell
 # Windows PowerShell
@@ -86,7 +130,7 @@ Copy-Item .env.example .env
 cp .env.example .env
 ```
 
-Required settings:
+Set the required values in `.env`:
 
 ```dotenv
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/portfolio_db
@@ -94,39 +138,46 @@ MISTRAL_API_KEY=your_mistral_api_key_here
 JWT_SECRET_KEY=change_this_to_a_long_random_secret
 ```
 
-Use a long, unique `JWT_SECRET_KEY` outside local development. Keep `.env` private; it is excluded by `.gitignore`.
+Use a long, unique `JWT_SECRET_KEY` outside local development. The `.env` file is excluded by `.gitignore` and should never be committed.
 
-## Run the Application
-
-Start the development server from the repository root:
+## Start the dashboard
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Open the dashboard at <http://127.0.0.1:8000>. The application creates missing database tables on startup.
+Open the application at **http://127.0.0.1:8000**. Missing database tables are created when the app starts.
 
-API documentation is available at:
+| Resource | URL |
+| --- | --- |
+| Dashboard | http://127.0.0.1:8000 |
+| Swagger UI | http://127.0.0.1:8000/docs |
+| ReDoc | http://127.0.0.1:8000/redoc |
 
-- Swagger UI: <http://127.0.0.1:8000/docs>
-- ReDoc: <http://127.0.0.1:8000/redoc>
+## API map
 
-## API Areas
+| Area | Endpoint | Purpose |
+| --- | --- | --- |
+| Auth | `/api/auth` | Registration, login, logout, and current user |
+| Portfolios | `/api/portfolios` | Create and manage portfolios |
+| Holdings | `/api/holdings` | Add and manage positions |
+| Analytics | `/api/analytics` | Calculate portfolio metrics |
+| Insights | `/api/insights` | Generate AI portfolio commentary |
+| Market | `/api/market/indices` | Read Nifty 50 and Sensex data |
+| News | `/api/market/news` | Read business headlines |
 
-- `/api/auth` - registration, login, logout, and current-user access
-- `/api/portfolios` - portfolio management
-- `/api/holdings` - holding management
-- `/api/analytics` - portfolio metrics
-- `/api/insights` - AI-generated portfolio insights
-- `/api/market/indices` - Nifty 50 and Sensex data
-- `/api/market/news` - business headlines
-
-## Tests
-
-Run the complete test suite:
+## Test
 
 ```bash
 python -m pytest -q
 ```
 
-The tests use an in-memory SQLite database and do not require a running PostgreSQL instance.
+The suite uses an in-memory SQLite database, so PostgreSQL is not required to run the tests.
+
+---
+
+<div align="center">
+
+Built with FastAPI, PostgreSQL, yfinance, and Mistral AI.
+
+</div>
