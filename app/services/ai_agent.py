@@ -8,6 +8,9 @@ try:
     HAS_LANGCHAIN = True
 except ImportError:
     HAS_LANGCHAIN = False
+    ChatMistralAI = None
+    SystemMessage = HumanMessage = AIMessage = None
+    StrOutputParser = None
 
 from app.core.config import settings
 
@@ -136,6 +139,10 @@ def run_chat_agent(
         return _offline_chat_fallback(message, metrics, holdings_str, sector_str)
         
     try:
+        if not HAS_LANGCHAIN or ChatMistralAI is None:
+            logger.warning("LangChain Mistral integration is unavailable; using offline fallback agent.")
+            return _offline_chat_fallback(message, metrics, holdings_str, sector_str)
+
         # Limit completion output length to cap output token costs
         llm = ChatMistralAI(
             api_key=api_key,

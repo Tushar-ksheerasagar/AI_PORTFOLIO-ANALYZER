@@ -387,7 +387,7 @@
                 </div>
 
                 <!-- ROW 6: AI Insights Layer -->
-                <div class="card col-span-3 insights-card">
+                <div class="card col-span-2 insights-card">
                     <div class="card-header insights-header">
                         <div class="insights-title-area">
                             <i class="fa-solid fa-sparkles"></i>
@@ -432,6 +432,29 @@
 
                         <div id="insight-disclaimer" class="insight-disclaimer">
                             Disclaimer: Educational commentary only.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card col-span-1 rebalancer-inline-panel">
+                    <div class="card-header insights-header">
+                        <div class="insights-title-area">
+                            <i class="fa-solid fa-scale-unbalanced-flip" style="color: var(--primary);"></i>
+                            <h4>Smart Rebalancer</h4>
+                        </div>
+                        <button id="run-rebalancer-btn" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(139,92,246,0.25);">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> Scan Underperforming Stock
+                        </button>
+                    </div>
+
+                    <div id="rebalancer-modal-loading" class="rebalancer-loading hidden" style="text-align: center; padding: 30px 0; color: var(--text-secondary);">
+                        <i class="fa-solid fa-spinner fa-spin fa-lg" style="margin-bottom: 10px; color: #a78bfa; display: block;"></i>
+                        <div style="font-size: 12px;">Analyzing positions...</div>
+                    </div>
+
+                    <div id="rebalancer-modal-output" style="overflow-y: auto; min-height: 120px; padding-right: 4px;">
+                        <div class="text-muted" style="font-size: 12.5px; text-align: center; padding: 30px 0;">
+                            Click "Scan Underperforming Stock" to find weak assets and suggest alternatives.
                         </div>
                     </div>
                 </div>
@@ -488,37 +511,6 @@
                 <i class="fa-solid fa-paper-plane"></i>
             </button>
         </form>
-    </div>
-
-    <!-- FLOATING REBALANCER WIDGET -->
-    <button id="rebalancer-toggle-floating" class="rebalancer-floating-bubble hidden" title="Smart Rebalancer" aria-label="Open Smart Rebalancer">
-        <i class="fa-solid fa-scale-unbalanced-flip"></i>
-    </button>
-
-    <div id="rebalancer-floating-widget" class="rebalancer-floating-widget hidden">
-        <div class="rebalancer-widget-header">
-            <div class="rebalancer-widget-title">
-                <i class="fa-solid fa-scale-unbalanced-flip"></i>
-                <span>Smart Rebalancer</span>
-            </div>
-            <button id="rebalancer-close-floating" class="rebalancer-widget-close" title="Minimize"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="rebalancer-widget-body">
-            <div style="text-align: center; margin-bottom: 12px;">
-                <button id="run-rebalancer-btn" class="btn btn-primary btn-block btn-sm" style="font-size: 12.5px; height: 36px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(139,92,246,0.25);">
-                    <i class="fa-solid fa-magnifying-glass-chart"></i> Scan Underperforming Stock
-                </button>
-            </div>
-            <div id="rebalancer-modal-loading" class="rebalancer-loading hidden" style="text-align: center; padding: 30px 0; color: var(--text-secondary);">
-                <i class="fa-solid fa-spinner fa-spin fa-lg" style="margin-bottom: 10px; color: #a78bfa; display: block;"></i>
-                <div style="font-size: 12px;">Analyzing positions...</div>
-            </div>
-            <div id="rebalancer-modal-output" style="overflow-y: auto; flex: 1; padding-right: 4px;">
-                <div class="text-muted" style="font-size: 12.5px; text-align: center; padding: 30px 0;">
-                    Click "Scan Underperforming Stock" to find weak assets and suggest alternatives.
-                </div>
-            </div>
-        </div>
     </div>
 
     <script src="js/app.js"></script>
