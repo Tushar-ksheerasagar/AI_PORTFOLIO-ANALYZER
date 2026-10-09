@@ -13,6 +13,7 @@ except ImportError:
     StrOutputParser = None
 
 from app.core.config import settings
+from app.services.gemini import generate_chat, generate_rebalance, is_gemini_configured
 
 
 logger = logging.getLogger(__name__)
@@ -135,7 +136,12 @@ def run_chat_agent(
     """
     api_key = settings.MISTRAL_API_KEY
     if not api_key or "your_mistral_api_key" in api_key.lower():
-        logger.info("Using GrowwPro offline fallback agent (API key unconfigured).")
+        logger.info("Mistral API key is not configured; trying Gemini chat backup.")
+        if is_gemini_configured():
+            try:
+                return generate_chat(message, history, metrics, holdings_str, sector_str)
+            except Exception as error:
+                logger.error("Gemini backup failed for chat: %s", error, exc_info=True)
         return _offline_chat_fallback(message, metrics, holdings_str, sector_str)
         
     try:
@@ -193,7 +199,12 @@ def run_chat_agent(
         return response
         
     except Exception as e:
-        logger.error(f"Error inside LangChain Chat Agent: {str(e)}. Switching to intelligent fallback.", exc_info=True)
+        logger.error("Mistral chat failed: %s. Trying Gemini backup.", e, exc_info=True)
+        if is_gemini_configured():
+            try:
+                return generate_chat(message, history, metrics, holdings_str, sector_str)
+            except Exception as gemini_error:
+                logger.error("Gemini backup failed for chat: %s", gemini_error, exc_info=True)
         return _offline_chat_fallback(message, metrics, holdings_str, sector_str)
 
 from app.schemas.insight import RebalanceResponse, RecommendationItem
@@ -275,7 +286,17 @@ def recommend_stock_replacements(
     
     # 2. Check if API key is unset or placeholders are used
     if not api_key or "your_mistral_api_key" in api_key.lower():
-        logger.warning("Mistral API key is not configured. Using offline rebalancer fallback.")
+        logger.warning("Mistral API key is not configured; trying Gemini rebalancer backup.")
+        if is_gemini_configured():
+            try:
+                return generate_rebalance(
+                    weakest_ticker,
+                    weakest_sector,
+                    weakest_return,
+                    weakest_buy_price,
+                )
+            except Exception as error:
+                logger.error("Gemini backup failed for rebalancing: %s", error, exc_info=True)
         picks = sector_fallbacks.get(weakest_sector, default_fallback)
         return RebalanceResponse(
             weak_stock=weakest_ticker,
@@ -299,14 +320,24 @@ def recommend_stock_replacements(
             f"Recommend 2 strong alternatives in the {weakest_sector} sector."
         )
         
-        response = client.chat.parse(
-            model=settings.MISTRAL_MODEL,
-            messages=[
+        request = {
+            "messages": [
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": user_prompt}
             ],
-            response_format=RebalanceResponse
-        )
+            "response_format": RebalanceResponse
+        }
+        try:
+            response = client.chat.parse(model=settings.MISTRAL_MODEL, **request)
+        except Exception as error:
+            if "tier_not_allowed" not in str(error) or settings.MISTRAL_MODEL == settings.MISTRAL_FALLBACK_MODEL:
+                raise
+            logger.warning(
+                "Mistral model '%s' is unavailable for this subscription. Retrying with '%s'.",
+                settings.MISTRAL_MODEL,
+                settings.MISTRAL_FALLBACK_MODEL,
+            )
+            response = client.chat.parse(model=settings.MISTRAL_FALLBACK_MODEL, **request)
         
         parsed = response.choices[0].message.parsed
         if parsed:
@@ -315,7 +346,17 @@ def recommend_stock_replacements(
             raise ValueError("Mistral returned an empty rebalance response")
             
     except Exception as e:
-        logger.error(f"Error calling Mistral AI API for rebalancing: {str(e)}. Using fallback rebalancer.", exc_info=True)
+        logger.error("Mistral rebalancing failed: %s. Trying Gemini backup.", e, exc_info=True)
+        if is_gemini_configured():
+            try:
+                return generate_rebalance(
+                    weakest_ticker,
+                    weakest_sector,
+                    weakest_return,
+                    weakest_buy_price,
+                )
+            except Exception as gemini_error:
+                logger.error("Gemini backup failed for rebalancing: %s", gemini_error, exc_info=True)
         picks = sector_fallbacks.get(weakest_sector, default_fallback)
         return RebalanceResponse(
             weak_stock=weakest_ticker,

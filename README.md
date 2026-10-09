@@ -21,8 +21,8 @@ A full-stack portfolio intelligence dashboard for Indian equities, combining liv
 
 AI Portfolio Analyzer turns a collection of holdings into a readable decision surface. Create portfolios, add Indian equity positions, inspect performance and risk, then ask the AI layer to explain what the numbers suggest.
 
-| Track | Understand | Act |
-| --- | --- | --- |
+| Track                      | Understand                                                           | Act                                                               |
+| -------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | NSE/BSE prices and history | Returns, volatility, beta, Sharpe ratio, drawdown, and concentration | Review AI summaries, risk notes, diversification, and watch lists |
 
 ## What is inside
@@ -59,13 +59,13 @@ Browser (HTML + CSS + JavaScript + Chart.js)
 (SQLAlchemy) (market)  (insights)
 ```
 
-| Layer | Tools |
-| --- | --- |
-| Interface | HTML, vanilla JavaScript, CSS, Chart.js |
-| API | FastAPI, Uvicorn, Pydantic |
-| Data | PostgreSQL, SQLAlchemy |
-| Intelligence | yfinance, Mistral AI, LangChain |
-| Quality | pytest, in-memory SQLite test database |
+| Layer        | Tools                                   |
+| ------------ | --------------------------------------- |
+| Interface    | HTML, vanilla JavaScript, CSS, Chart.js |
+| API          | FastAPI, Uvicorn, Pydantic              |
+| Data         | PostgreSQL, SQLAlchemy                  |
+| Intelligence | yfinance, Mistral AI, LangChain         |
+| Quality      | pytest, in-memory SQLite test database  |
 
 ## Project map
 
@@ -135,8 +135,22 @@ Set the required values in `.env`:
 ```dotenv
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/portfolio_db
 MISTRAL_API_KEY=your_mistral_api_key_here
+MISTRAL_MODEL=mistral-small-latest
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-3.5-flash-lite
 JWT_SECRET_KEY=change_this_to_a_long_random_secret
 ```
+
+`mistral-small-latest` is the default model and is suitable for accounts that
+cannot access the larger Mistral models. If your `.env` already sets
+`MISTRAL_MODEL` to a restricted model, update it to this value or another model
+available in your Mistral workspace.
+
+Gemini is used as the backup provider for insights, chat, and rebalancing when
+Mistral is unavailable or rate-limited. Set `GEMINI_API_KEY` in `.env`; the
+configured default model is `gemini-3.5-flash-lite`. If Google exposes the model
+under a different name for your account, set `GEMINI_MODEL` to that model name.
+If both providers fail, the existing local fallback engines are used.
 
 Use a long, unique `JWT_SECRET_KEY` outside local development. The `.env` file is excluded by `.gitignore` and should never be committed.
 
@@ -148,23 +162,23 @@ uvicorn app.main:app --reload
 
 Open the application at **http://127.0.0.1:8000**. Missing database tables are created when the app starts.
 
-| Resource | URL |
-| --- | --- |
-| Dashboard | http://127.0.0.1:8000 |
-| Swagger UI | http://127.0.0.1:8000/docs |
-| ReDoc | http://127.0.0.1:8000/redoc |
+| Resource   | URL                         |
+| ---------- | --------------------------- |
+| Dashboard  | http://127.0.0.1:8000       |
+| Swagger UI | http://127.0.0.1:8000/docs  |
+| ReDoc      | http://127.0.0.1:8000/redoc |
 
 ## API map
 
-| Area | Endpoint | Purpose |
-| --- | --- | --- |
-| Auth | `/api/auth` | Registration, login, logout, and current user |
-| Portfolios | `/api/portfolios` | Create and manage portfolios |
-| Holdings | `/api/holdings` | Add and manage positions |
-| Analytics | `/api/analytics` | Calculate portfolio metrics |
-| Insights | `/api/insights` | Generate AI portfolio commentary |
-| Market | `/api/market/indices` | Read Nifty 50 and Sensex data |
-| News | `/api/market/news` | Read business headlines |
+| Area       | Endpoint              | Purpose                                       |
+| ---------- | --------------------- | --------------------------------------------- |
+| Auth       | `/api/auth`           | Registration, login, logout, and current user |
+| Portfolios | `/api/portfolios`     | Create and manage portfolios                  |
+| Holdings   | `/api/holdings`       | Add and manage positions                      |
+| Analytics  | `/api/analytics`      | Calculate portfolio metrics                   |
+| Insights   | `/api/insights`       | Generate AI portfolio commentary              |
+| Market     | `/api/market/indices` | Read Nifty 50 and Sensex data                 |
+| News       | `/api/market/news`    | Read business headlines                       |
 
 ## Test
 

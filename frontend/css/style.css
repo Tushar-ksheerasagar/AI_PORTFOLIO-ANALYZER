@@ -1183,6 +1183,10 @@ label {
     display: none;
 }
 
+.sidebar.collapsed .theme-toggle-wrapper {
+    display: none;
+}
+
 .sidebar.collapsed .nav-label {
     display: none;
 }

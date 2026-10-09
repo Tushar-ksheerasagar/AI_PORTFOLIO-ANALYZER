@@ -6,6 +6,7 @@ from typing import List, Dict, Any, Optional
 from mistralai.client import Mistral
 from app.core.config import settings
 from app.schemas.insight import AIInsightContent
+from app.services.gemini import generate_insight, is_gemini_configured
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +97,12 @@ def generate_ai_insights(metrics: Dict[str, Any]) -> AIInsightContent:
     api_key = settings.MISTRAL_API_KEY
     # Check if API key is unset or placeholders are used
     if not api_key or "your_mistral_api_key" in api_key.lower():
-        logger.warning("Mistral API key is not configured or using default placeholder. Using fallback engine.")
+        logger.warning("Mistral API key is not configured; trying Gemini backup.")
+        if is_gemini_configured():
+            try:
+                return generate_insight(metrics)
+            except Exception as error:
+                logger.error("Gemini backup failed for insights: %s", error, exc_info=True)
         return generate_fallback_insight(metrics)
         
     try:
@@ -130,14 +136,24 @@ def generate_ai_insights(metrics: Dict[str, Any]) -> AIInsightContent:
             f"Holdings: {holdings_str}"
         )
         
-        response = client.chat.parse(
-            model=settings.MISTRAL_MODEL,
-            messages=[
+        request = {
+            "messages": [
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": user_prompt}
             ],
-            response_format=AIInsightContent
-        )
+            "response_format": AIInsightContent
+        }
+        try:
+            response = client.chat.parse(model=settings.MISTRAL_MODEL, **request)
+        except Exception as error:
+            if "tier_not_allowed" not in str(error) or settings.MISTRAL_MODEL == settings.MISTRAL_FALLBACK_MODEL:
+                raise
+            logger.warning(
+                "Mistral model '%s' is unavailable for this subscription. Retrying with '%s'.",
+                settings.MISTRAL_MODEL,
+                settings.MISTRAL_FALLBACK_MODEL,
+            )
+            response = client.chat.parse(model=settings.MISTRAL_FALLBACK_MODEL, **request)
         
         parsed = response.choices[0].message.parsed
         if parsed:
@@ -146,5 +162,10 @@ def generate_ai_insights(metrics: Dict[str, Any]) -> AIInsightContent:
             raise ValueError("Mistral returned an empty parsed response")
             
     except Exception as e:
-        logger.error(f"Error calling Mistral AI API: {str(e)}. Using fallback engine.", exc_info=True)
+        logger.error("Error calling Mistral AI API: %s. Trying Gemini backup.", e, exc_info=True)
+        if is_gemini_configured():
+            try:
+                return generate_insight(metrics)
+            except Exception as gemini_error:
+                logger.error("Gemini backup failed for insights: %s", gemini_error, exc_info=True)
         return generate_fallback_insight(metrics)

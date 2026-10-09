@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     
     MISTRAL_API_KEY: str = "your_mistral_api_key_here"
-    MISTRAL_MODEL: str = "mistral-large-latest"
+    MISTRAL_MODEL: str = "mistral-small-latest"
+    MISTRAL_FALLBACK_MODEL: str = "mistral-small-latest"
+    GEMINI_API_KEY: str = "your_gemini_api_key_here"
+    GEMINI_MODEL: str = "gemini-3.5-flash-lite"
 
 settings = Settings()
