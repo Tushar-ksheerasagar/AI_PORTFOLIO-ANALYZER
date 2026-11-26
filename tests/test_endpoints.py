@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.main import app
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.base import Base
 
@@ -52,6 +53,21 @@ def test_user_registration_and_login():
     profile_response = client.get("/api/auth/me")
     assert profile_response.status_code == 200
     assert profile_response.json()["email"] == "test@example.com"
+
+def test_login_cookie_uses_secure_flag_when_configured(monkeypatch):
+    monkeypatch.setattr(settings, "COOKIE_SECURE", True)
+    client.post(
+        "/api/auth/register",
+        json={"email": "secure-cookie@example.com", "password": "password123"}
+    )
+
+    response = client.post(
+        "/api/auth/login",
+        json={"email": "secure-cookie@example.com", "password": "password123"}
+    )
+
+    assert response.status_code == 200
+    assert "secure" in response.headers["set-cookie"].lower()
 
 def test_portfolio_crud():
     # Register & Login

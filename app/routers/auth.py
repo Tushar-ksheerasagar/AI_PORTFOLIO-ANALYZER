@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import APIKeyCookie
 from sqlalchemy.orm import Session
 from typing import Optional
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_password_hash, verify_password, create_access_token, decode_access_token
 from app.models.user import User
@@ -76,7 +77,7 @@ def login(response: Response, user_in: UserCreate, db: Session = Depends(get_db)
         httponly=True,
         max_age=3600,  # 1 hour
         samesite="lax",
-        secure=False  # True in production with HTTPS
+        secure=settings.COOKIE_SECURE
     )
     return {"message": "Login successful"}
 

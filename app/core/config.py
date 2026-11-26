@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     
     JWT_SECRET_KEY: str = "supersecretjwtkeychangethisinproduction12345"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    COOKIE_SECURE: bool = False
     
     MISTRAL_API_KEY: str = "your_mistral_api_key_here"
     MISTRAL_MODEL: str = "mistral-small-latest"

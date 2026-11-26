@@ -139,6 +139,7 @@ MISTRAL_MODEL=mistral-small-latest
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-3.5-flash-lite
 JWT_SECRET_KEY=change_this_to_a_long_random_secret
+COOKIE_SECURE=false
 ```
 
 `mistral-small-latest` is the default model and is suitable for accounts that
@@ -153,6 +154,7 @@ under a different name for your account, set `GEMINI_MODEL` to that model name.
 If both providers fail, the existing local fallback engines are used.
 
 Use a long, unique `JWT_SECRET_KEY` outside local development. The `.env` file is excluded by `.gitignore` and should never be committed.
+Set `COOKIE_SECURE=true` when serving the app over HTTPS. Local HTTP development can keep it set to `false`.
 
 ## Start the dashboard
 
@@ -167,6 +169,30 @@ Open the application at **http://127.0.0.1:8000**. Missing database tables are c
 | Dashboard  | http://127.0.0.1:8000       |
 | Swagger UI | http://127.0.0.1:8000/docs  |
 | ReDoc      | http://127.0.0.1:8000/redoc |
+
+## Deploy free with Render and Neon
+
+The included `render.yaml` configures a free Render web service in Ohio, builds
+the Python dependencies, starts the FastAPI app, generates a `JWT_SECRET_KEY`,
+and enables secure cookies for HTTPS. The frontend is served by FastAPI, so no
+separate frontend service is needed.
+
+1. Create a Neon project with its PostgreSQL database in the same region as the
+   Render service. Copy the pooled PostgreSQL connection URI from Neon.
+2. Push this repository to GitHub.
+3. In Render, choose **New → Blueprint**, connect this repository, and select
+   `render.yaml`.
+4. When prompted, provide the Neon URI for `DATABASE_URL`. Render generates the
+   `JWT_SECRET_KEY`; do not commit database credentials or API keys to GitHub.
+5. Deploy the Blueprint. Add `MISTRAL_API_KEY` and/or `GEMINI_API_KEY` in the
+   Render service's environment settings if you want to enable those AI
+   providers. Their free usage is subject to each provider's quotas.
+6. Open the Render URL, register a test account, and verify that login and
+   portfolio data persist after refreshing the page.
+
+Neon's free plan has storage and compute quotas. Render's free web service
+sleeps after inactivity and has an ephemeral filesystem, so PostgreSQL data
+must remain in Neon. Free tiers are best suited to demos and hobby projects.
 
 ## API map
 
